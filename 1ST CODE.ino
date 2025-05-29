@@ -7,7 +7,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 const int IR_PIN = 2;           // IR sensor output pin
 const int TRIG_PIN = 9;         // Ultrasonic trigger pin
 const int ECHO_PIN = 10;        // Ultrasonic echo pin
-const int LED_PIN = 7; 
+const int LED_PIN = 13; 
 
 // Variables
 int bottleCount = 0;            // Counter for bottles
