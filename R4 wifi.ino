@@ -212,13 +212,40 @@ void initializeWiFi() {
   Serial.print("Attempting to connect to WiFi network: ");
   Serial.println(ssid);
   
+  // Disconnect any previous connection
+  WiFi.disconnect();
+  delay(1000);
+  
+  // Set WiFi mode to station
+  WiFi.mode(WIFI_STA);
+  delay(100);
+  
+  // Begin WiFi connection with timeout
   WiFi.begin(ssid, password);
   
   int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+  const int maxAttempts = 30; // Increase attempts
+  
+  while (WiFi.status() != WL_CONNECTED && attempts < maxAttempts) {
     delay(1000);
     Serial.print(".");
     attempts++;
+    
+    // Print current status for debugging
+    if (attempts % 5 == 0) {
+      Serial.print(" [Status: ");
+      Serial.print(WiFi.status());
+      Serial.print("] ");
+    }
+    
+    // Try to reconnect every 10 attempts
+    if (attempts % 10 == 0 && attempts < maxAttempts) {
+      Serial.println();
+      Serial.println("Retrying WiFi connection...");
+      WiFi.disconnect();
+      delay(1000);
+      WiFi.begin(ssid, password);
+    }
   }
   
   if (WiFi.status() == WL_CONNECTED) {
@@ -227,10 +254,26 @@ void initializeWiFi() {
     Serial.println("WiFi connected successfully!");
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
+    Serial.print("Signal strength (RSSI): ");
+    Serial.print(WiFi.RSSI());
+    Serial.println(" dBm");
+    Serial.print("MAC address: ");
+    Serial.println(WiFi.macAddress());
   } else {
     wifiConnected = false;
     Serial.println();
-    Serial.println("Failed to connect to WiFi");
+    Serial.println("Failed to connect to WiFi after maximum attempts");
+    Serial.print("Final WiFi status: ");
+    Serial.println(WiFi.status());
+    Serial.println("WiFi Status Codes:");
+    Serial.println("0 = WL_IDLE_STATUS");
+    Serial.println("1 = WL_NO_SSID_AVAIL");
+    Serial.println("2 = WL_SCAN_COMPLETED");
+    Serial.println("3 = WL_CONNECTED");
+    Serial.println("4 = WL_CONNECT_FAILED");
+    Serial.println("5 = WL_CONNECTION_LOST");
+    Serial.println("6 = WL_DISCONNECTED");
+    Serial.println("System will continue without WiFi functionality");
   }
 }
 
@@ -242,7 +285,31 @@ void checkWiFiConnection() {
   if (WiFi.status() != WL_CONNECTED && wifiConnected) {
     wifiConnected = false;
     Serial.println("WiFi connection lost! Attempting to reconnect...");
+    
+    // Attempt immediate reconnection
+    WiFi.disconnect();
+    delay(1000);
     WiFi.begin(ssid, password);
+    
+    // Wait up to 10 seconds for reconnection
+    int reconnectAttempts = 0;
+    while (WiFi.status() != WL_CONNECTED && reconnectAttempts < 10) {
+      delay(1000);
+      reconnectAttempts++;
+      Serial.print(".");
+    }
+    
+    if (WiFi.status() == WL_CONNECTED) {
+      wifiConnected = true;
+      Serial.println();
+      Serial.println("WiFi reconnected successfully!");
+      Serial.print("IP address: ");
+      Serial.println(WiFi.localIP());
+    } else {
+      Serial.println();
+      Serial.println("Failed to reconnect to WiFi");
+    }
+    
   } else if (WiFi.status() == WL_CONNECTED && !wifiConnected) {
     wifiConnected = true;
     Serial.println("WiFi reconnected!");
@@ -309,10 +376,10 @@ void sendBinEmptyNotification() {
   
   // Create JSON payload
   String jsonPayload = "{";
-  jsonPayload += "\"status\"😕"empty\",";
-  jsonPayload += "\"message\"😕"Bin is now empty - ready for use\",";
-  jsonPayload += "\"timestamp\"😕"" + String(millis()) + "\",";
-  jsonPayload += "\"device_id\"😕"ecobot_001\"";
+  jsonPayload += "\"status\":\"empty\",";
+  jsonPayload += "\"message\":\"Bin is now empty - ready for use\",";
+  jsonPayload += "\"timestamp\":\"" + String(millis()) + "\",";
+  jsonPayload += "\"device_id\":\"ecobot_001\"";
   jsonPayload += "}";
   
   // Make HTTP POST request
