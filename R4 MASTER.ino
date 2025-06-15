@@ -1,8 +1,9 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <SoftwareSerial.h>
 
-// Hardware Serial for communication with slave Arduino (R4 has Serial1)
-// No need for SoftwareSerial on R4
+// SoftwareSerial for communication with slave Arduino (R3 compatible)
+SoftwareSerial slaveSerial(12, A1); // RX on pin 12, TX on pin A1
 
 // LCD
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -105,7 +106,7 @@ const int BUZZER_FREQUENCY = 1000;
 
 void setup() {
   Serial.begin(9600);
-  Serial1.begin(9600); // Initialize Hardware Serial1 communication for R4
+  slaveSerial.begin(9600); // Initialize SoftwareSerial communication for R3
 
   // Button setup
   pinMode(START_BUTTON_PIN, INPUT_PULLUP);
@@ -421,8 +422,8 @@ float getSingleUltrasonicReading() {
 }
 
 void sendServoCommand(int command) {
-  Serial1.print(command); // Using Serial1 instead of slaveSerial
-  Serial1.println(); // Send newline as delimiter
+  slaveSerial.print(command); // Using slaveSerial instead of Serial1
+  slaveSerial.println(); // Send newline as delimiter
   
   servoInAction = true;
   servoCommandTime = millis();
@@ -470,11 +471,11 @@ void checkServoStatus() {
 }
 
 void requestServoStatus() {
-  Serial1.println("STATUS"); // Using Serial1 instead of slaveSerial
+  slaveSerial.println("STATUS"); // Using slaveSerial instead of Serial1
   delay(10); // Small delay for response
   
-  if (Serial1.available()) { // Using Serial1 instead of slaveSerial
-    String response = Serial1.readStringUntil('\n');
+  if (slaveSerial.available()) { // Using slaveSerial instead of Serial1
+    String response = slaveSerial.readStringUntil('\n');
     int status = response.toInt();
     
     if (status == 0) { // Servo action completed
