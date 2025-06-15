@@ -216,10 +216,6 @@ void initializeWiFi() {
   WiFi.disconnect();
   delay(1000);
   
-  // Set WiFi mode to station
-  WiFi.mode(WIFI_STA);
-  delay(100);
-  
   // Begin WiFi connection with timeout
   WiFi.begin(ssid, password);
   
