@@ -266,10 +266,10 @@ void sendBinFullNotification() {
   
   // Create JSON payload
   String jsonPayload = "{";
-  jsonPayload += "\"status\"😕"full\",";
-  jsonPayload += "\"message\"😕"Bin is full - please empty\",";
-  jsonPayload += "\"timestamp\"😕"" + String(millis()) + "\",";
-  jsonPayload += "\"device_id\"😕"ecobot_001\"";
+  jsonPayload += "\"status\":\"full\",";
+  jsonPayload += "\"message\":\"Bin is full - please empty\",";
+  jsonPayload += "\"timestamp\":\"" + String(millis()) + "\",";
+  jsonPayload += "\"device_id\":\"ecobot_001\"";
   jsonPayload += "}";
   
   // Make HTTP POST request
