@@ -1,7 +1,8 @@
 #include <Servo.h>
+#include <SoftwareSerial.h>
 
-// Hardware Serial for communication with master Arduino (R4 uses Serial1)
-// No need for SoftwareSerial on R4
+// SoftwareSerial for communication with master Arduino (R3 compatible)
+SoftwareSerial masterSerial(2, 3); // RX on pin 2, TX on pin 3
 
 // MG996R Servo Motor (REJECT AND COUNTER INCREMENT)
 Servo rejectServo;
@@ -49,8 +50,8 @@ const int STATUS_LED_PIN = 13;
 void setup() {
   Serial.begin(9600);
   
-  // Initialize Hardware Serial1 communication for R4
-  Serial1.begin(9600);
+  // Initialize SoftwareSerial communication for R3
+  masterSerial.begin(9600);
   
   // Initialize MG996R servo to default 45° position
   rejectServo.attach(SERVO_PIN);
@@ -76,7 +77,7 @@ void setup() {
   Serial.println("- Default: 0, Dispense: 90");
   Serial.println("MG995: Pin 5 (3-bottle only)");
   Serial.println("- 360 rotation then detach");
-  Serial.println("Hardware Serial1 ready");
+  Serial.println("SoftwareSerial ready");
 
   // Test SG90 servo
   Serial.println("Testing SG90...");
@@ -96,13 +97,13 @@ void loop() {
 }
 
 void handleSerialCommunication() {
-  if (Serial1.available()) { // Using Serial1 instead of masterSerial
-    String receivedData = Serial1.readStringUntil('\n');
+  if (masterSerial.available()) { // Using masterSerial instead of Serial1
+    String receivedData = masterSerial.readStringUntil('\n');
     receivedData.trim();
     
     if (receivedData == "STATUS") {
       // Send status back to master
-      Serial1.println(servoStatus); // Using Serial1 instead of masterSerial
+      masterSerial.println(servoStatus); // Using masterSerial instead of Serial1
       Serial.print("Status requested - Sending: ");
       Serial.println(servoStatus);
     } else {
