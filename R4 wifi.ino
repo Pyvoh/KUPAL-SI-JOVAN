@@ -253,8 +253,8 @@ void initializeWiFi() {
     Serial.print("Signal strength (RSSI): ");
     Serial.print(WiFi.RSSI());
     Serial.println(" dBm");
-    Serial.print("MAC address: ");
-    Serial.println(WiFi.macAddress());
+    // Removed the problematic macAddress() call
+    Serial.println("MAC address: Available via WiFi.macAddress() if needed");
   } else {
     wifiConnected = false;
     Serial.println();
