@@ -1,26 +1,25 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-#include <SoftwareSerial.h>
 
-// Software Serial for communication with slave Arduino
-SoftwareSerial slaveSerial(12, A1); // RX=12, TX=A1
+// Hardware Serial for communication with slave Arduino (R4 has Serial1)
+// No need for SoftwareSerial on R4
 
 // LCD
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-// Buzzer Pin - Changed from A0 to digital pin for R4 compatibility
-const int BUZZER_PIN = 4; // Changed from A0 to digital pin 4
+// Buzzer Pin
+const int BUZZER_PIN = A0;
 
 // Button Pins
 const int START_BUTTON_PIN = 11;
-const int RESET_BUTTON_PIN = 3; // New reset button pin
+const int RESET_BUTTON_PIN = 3; // Reset button pin
 
 // Start Button variables
 bool buttonState = HIGH;
 bool lastButtonState = HIGH;
 unsigned long lastDebounceTime = 0;
 const unsigned long DEBOUNCE_DELAY = 50;
-bool buttonPressed = false; // New variable to track if button was already pressed
+bool buttonPressed = false; // Variable to track if button was already pressed
 
 // Reset Button variables
 bool resetButtonState = HIGH;
@@ -31,14 +30,14 @@ unsigned long lastResetDebounceTime = 0;
 const int IR_PIN = 2;
 const int TRIG_PIN = 9;
 const int ECHO_PIN = 10;
-const int LED_PIN = 13; // External LED pin - change this to your desired pin
+const int LED_PIN = 13;
 
-// TCS3200 color sensor pins - Adjusted for R4
-#define S0 5  // Changed from 4 to 5
-#define S1 6  // Changed from 5 to 6
-#define S2 7  // Changed from 6 to 7
-#define S3 8  // Changed from 7 to 8
-#define sensorOut A0 // Changed from 8 to A0
+// TCS3200 color sensor pins
+#define S0 4
+#define S1 5
+#define S2 6
+#define S3 7
+#define sensorOut 8
 
 int redFreq, greenFreq, blueFreq;
 
@@ -106,11 +105,11 @@ const int BUZZER_FREQUENCY = 1000;
 
 void setup() {
   Serial.begin(9600);
-  slaveSerial.begin(9600); // Initialize Software Serial communication
+  Serial1.begin(9600); // Initialize Hardware Serial1 communication for R4
 
   // Button setup
   pinMode(START_BUTTON_PIN, INPUT_PULLUP);
-  pinMode(RESET_BUTTON_PIN, INPUT_PULLUP); // New reset button setup
+  pinMode(RESET_BUTTON_PIN, INPUT_PULLUP); // Reset button setup
 
   // IR & Ultrasonic
   pinMode(IR_PIN, INPUT);
@@ -151,7 +150,7 @@ void setup() {
   // Initialize color scan timer
   lastColorScanTime = millis();
   
-  Serial.println("Master Arduino R4 Ready - ECOBOT (3 bottles mode)");
+  Serial.println("Master Arduino Ready - ECOBOT (3 bottles mode)");
   Serial.println("Ultrasonic sensor active from start");
   Serial.println("Color sensor with 3-second scan delay enabled");
   Serial.println("Reset button available on pin 3");
@@ -159,7 +158,7 @@ void setup() {
 
 void loop() {
   handleButtonInput();
-  handleResetButton(); // New function call for reset button
+  handleResetButton(); // Function call for reset button
   
   // MOVED OUTSIDE systemReady condition - ultrasonic works from beginning
   checkContainerLevel();
@@ -422,8 +421,8 @@ float getSingleUltrasonicReading() {
 }
 
 void sendServoCommand(int command) {
-  slaveSerial.print(command);
-  slaveSerial.println(); // Send newline as delimiter
+  Serial1.print(command); // Using Serial1 instead of slaveSerial
+  Serial1.println(); // Send newline as delimiter
   
   servoInAction = true;
   servoCommandTime = millis();
@@ -471,11 +470,11 @@ void checkServoStatus() {
 }
 
 void requestServoStatus() {
-  slaveSerial.println("STATUS");
+  Serial1.println("STATUS"); // Using Serial1 instead of slaveSerial
   delay(10); // Small delay for response
   
-  if (slaveSerial.available()) {
-    String response = slaveSerial.readStringUntil('\n');
+  if (Serial1.available()) { // Using Serial1 instead of slaveSerial
+    String response = Serial1.readStringUntil('\n');
     int status = response.toInt();
     
     if (status == 0) { // Servo action completed
@@ -577,6 +576,3 @@ void handleBuzzer() {
     }
   }
 }
-
-
-//r4
