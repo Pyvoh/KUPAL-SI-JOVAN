@@ -15,7 +15,7 @@ const int SERVO_EMPTY_ANGLE = 140;      // 120° for emptying container
 // SG90 Servo Motor (3-BOTTLE COMPLETION ONLY)
 Servo sg90Servo;
 const int SG90_PIN = 6;  // Pin for SG90 servo
-const int SG90_DISPENSE_ANGLE = 90;  // 90° for 3-bottle completion only
+const int SG90_DISPENSE_ANGLE = 180;  // 90° for 3-bottle completion only
 const int SG90_DEFAULT_ANGLE = 0;    // 0° as default position
 
 // MG995 Servo Motor (3-BOTTLE COMPLETION ONLY - 360° rotation)
