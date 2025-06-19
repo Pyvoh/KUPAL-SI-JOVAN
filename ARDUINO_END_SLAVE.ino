@@ -8,9 +8,9 @@ SoftwareSerial masterSerial(2, 3); // RX=2, TX=3
 Servo rejectServo;
 const int SERVO_PIN = 9;
 const int SERVO_REJECT_ANGLE = 0;       // 0° for rejected bottles
-const int SERVO_DEFAULT_ANGLE = 45;     // 45° as default position
+const int SERVO_DEFAULT_ANGLE = 30;     // 45° as default position
 const int SERVO_ACCEPT_ANGLE = 90;      // 90° for accepted bottles
-const int SERVO_EMPTY_ANGLE = 180;      // 120° for emptying container
+const int SERVO_EMPTY_ANGLE = 140;      // 120° for emptying container
 
 // SG90 Servo Motor (3-BOTTLE COMPLETION ONLY)
 Servo sg90Servo;
