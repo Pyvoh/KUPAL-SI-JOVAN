@@ -6,8 +6,8 @@
 #include <ArduinoJson.h>
 
 // WiFi credentials
-const char* ssid = "BOSSING!!";        
-const char* password = "kupalkababoss"; 
+const char* ssid = "CARTZY";        
+const char* password = "123456789"; 
 
 // Web server configuration
 const char* serverAddress = "ecobot-server.onrender.com";
